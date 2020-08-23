@@ -1,15 +1,21 @@
 package com.example.recipefinder.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -38,7 +44,9 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     private ProgressBar loading;
 
     private TextView title, description;
+    private LinearLayout alert;
     private ImageView pic;
+    private Button siteBtn;
 
     private RecyclerView ingredientsRecycler, instructionsRecycler;
 
@@ -62,7 +70,8 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         pic = findViewById(R.id.pic);
         title = findViewById(R.id.recipeTitle);
         description = findViewById(R.id.recipeDesc);
-
+        alert = findViewById(R.id.noInfo);
+        siteBtn = findViewById(R.id.site);
         ingredientsRecycler = findViewById(R.id.ingredients);
         instructionsRecycler = findViewById(R.id.directions);
 
@@ -119,38 +128,59 @@ public class RecipeDetailsActivity extends AppCompatActivity {
     private class GetDetailsAsyncTask extends AsyncTask<String, Void, Void> {
 
         private Recipe recipe;
+        private boolean noInfo = false;
+        private String url;
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            fillView(recipe);
+            if (noInfo){
+                loading.setVisibility(View.GONE);
+                alert.setVisibility(View.VISIBLE);
+                siteBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)));
+                    }
+                });
+            }else{
+                fillView(recipe);
+                loading.setVisibility(View.GONE);
+                coordinatorLayout.setVisibility(View.VISIBLE);
+            }
 
-            loading.setVisibility(View.GONE);
-            coordinatorLayout.setVisibility(View.VISIBLE);
+
         }
 
         @Override
         protected Void doInBackground(String... strings) {
+            url = strings[0];
             try {
                 Document document = Jsoup.connect(strings[0]).get();
                 Element titleEl = document.selectFirst(".article-info .headline-wrapper h1");
-                String title = titleEl.text();
-                String desc = document.selectFirst(".recipe-summary p").text();
-                String imageUrl = document.selectFirst(".image-container img").attr("src");
-                Elements ingredients = document.select(".ingredients-item");
+                if (titleEl==null){
+                    // Toast its an ad sorry
+                    noInfo = true;
+                }else{
+                    String title = titleEl.text();
+                    String desc = document.selectFirst(".recipe-summary p").text();
+                    String imageUrl = document.selectFirst(".image-container img").attr("src");
+                    Elements ingredients = document.select(".ingredients-item");
 
-                List<String> ingredientsList = new ArrayList<>();
-                for (Element ingredient : ingredients) {
-                    ingredientsList.add(ingredient.selectFirst(".ingredients-item-name").text());
+                    List<String> ingredientsList = new ArrayList<>();
+                    for (Element ingredient : ingredients) {
+                        ingredientsList.add(ingredient.selectFirst(".ingredients-item-name").text());
+                    }
+
+                    Elements instructions = document.select(".instructions-section-item");
+                    List<String> instructionList = new ArrayList<>();
+                    for (Element instruction : instructions) {
+                        instructionList.add(instruction.selectFirst(".paragraph").text());
+                    }
+
+                    recipe = new Recipe(title, "", desc, imageUrl, strings[0], ingredientsList, instructionList);
                 }
 
-                Elements instructions = document.select(".instructions-section-item");
-                List<String> instructionList = new ArrayList<>();
-                for (Element instruction : instructions) {
-                    instructionList.add(instruction.selectFirst(".paragraph").text());
-                }
-
-                recipe = new Recipe(title, "", desc, imageUrl, strings[0], ingredientsList, instructionList);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -160,5 +190,12 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home){
+            super.onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 }

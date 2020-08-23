@@ -73,7 +73,7 @@ public class SearchActivity extends AppCompatActivity {
             super.onPostExecute(aVoid);
 
             loading.setVisibility(View.GONE);
-            SomeRecipeAdapter adapter = new SomeRecipeAdapter(SearchActivity.this);
+            SomeRecipeAdapter adapter = new SomeRecipeAdapter(SearchActivity.this, false);
             adapter.setRecipeList(recipesList);
             adapter.setOnItemClickListener(new SomeRecipeAdapter.OnItemClickListener() {
                 @Override
@@ -126,9 +126,9 @@ public class SearchActivity extends AppCompatActivity {
                     String imgUrl = imageUrl.attr("data-src");
                     String detailUrl = title.attr("href");
 
-                    if (!valid(detailUrl)){
-                        continue;
-                    }
+//                    if (!valid(detailUrl)){
+//                        continue;
+//                    }
                     Recipe resultRecipe = new Recipe(titleTxt,authorTxt,imgUrl,detailUrl);
                     recipesList.add(resultRecipe);
                     i+=1;

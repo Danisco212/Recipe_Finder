@@ -20,6 +20,7 @@ public class SomeRecipeAdapter extends RecyclerView.Adapter<SomeRecipeAdapter.So
 
     private List<Recipe> recipeList;
     private Context context;
+    private boolean isGrid;
 
     private OnItemClickListener onItemClickListener;
 
@@ -31,8 +32,9 @@ public class SomeRecipeAdapter extends RecyclerView.Adapter<SomeRecipeAdapter.So
         void onItemClick(int position);
     }
 
-    public SomeRecipeAdapter(Context context) {
+    public SomeRecipeAdapter(Context context, boolean isGrid) {
         this.context = context;
+        this.isGrid = isGrid;
     }
 
     public void setRecipeList(List<Recipe> recipeList) {
@@ -43,8 +45,12 @@ public class SomeRecipeAdapter extends RecyclerView.Adapter<SomeRecipeAdapter.So
     @Override
     public SomeRecipeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.recipe_list, parent, false);
-
+        View view;
+        if (isGrid){
+            view = inflater.inflate(R.layout.recipe_card, parent, false);
+        }else{
+            view = inflater.inflate(R.layout.recipe_list, parent, false);
+        }
         SomeRecipeViewHolder viewHolder = new SomeRecipeViewHolder(view, onItemClickListener);
 
         return viewHolder;

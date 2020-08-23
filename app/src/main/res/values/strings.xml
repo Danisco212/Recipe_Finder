@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Recipe Finder</string>
+
+    <string-array name="sort">
+        <item>Best Match</item>
+        <item>Recent</item>
+        <item>Popular</item>
+    </string-array>
 </resources>

@@ -118,4 +118,33 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:id="@+id/loading"/>
+
+    <LinearLayout
+        android:id="@+id/noInfo"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="We cant parse the info on this recipe, sorry"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textColor="@color/text_color"
+            android:gravity="center"/>
+
+        <Button
+            android:id="@+id/site"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:background="@color/fills"
+            android:text="Visit site"
+            android:textColor="@color/highlight"/>
+    </LinearLayout>
+
 </RelativeLayout>
